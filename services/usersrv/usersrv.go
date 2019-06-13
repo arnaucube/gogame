@@ -57,15 +57,16 @@ func (srv Service) Register(name, password, email string) (*models.User, error) 
 
 var signingKey = []byte("TODO") // TODO
 
-func (srv Service) Login(email, password string) (*models.User, error) {
+func (srv Service) Login(email, password string) (*string, *models.User, error) {
 	var user models.User
 	err := srv.db.Users.Find(bson.M{"email": email}).One(&user)
 	if err != nil {
-		return nil, errors.New("user not exist")
+		return nil, nil, errors.New("user not exist")
 	}
 	if !checkPasswordHash(password, user.Password) {
-		return nil, errors.New("error with password")
+		return nil, nil, errors.New("error with password")
 	}
+	user.Password = ""
 
 	// create jwt
 	token := jwt.New(jwt.SigningMethodHS256)
@@ -76,12 +77,8 @@ func (srv Service) Login(email, password string) (*models.User, error) {
 
 	tokenString, err := token.SignedString(signingKey)
 	if err != nil {
-		return nil, errors.New("error creating token")
+		return nil, nil, errors.New("error creating token")
 	}
 
-	// TODO
-	// reuse Password parameter, to put there the token
-	user.Password = tokenString
-
-	return &user, err
+	return &tokenString, &user, err
 }

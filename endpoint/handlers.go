@@ -50,12 +50,13 @@ type LoginMsg struct {
 func handleLogin(c *gin.Context) {
 	var loginMsg LoginMsg
 	c.BindJSON(&loginMsg)
-	user, err := userservice.Login(loginMsg.Email, loginMsg.Password)
+	token, user, err := userservice.Login(loginMsg.Email, loginMsg.Password)
 	if err != nil {
 		fail(c, err, "error on login")
 		return
 	}
 	c.JSON(200, gin.H{
-		"user": user,
+		"token": token,
+		"user":  user,
 	})
 }
