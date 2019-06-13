@@ -1,0 +1,5 @@
+package usersrv
+
+func New() {
+
+}

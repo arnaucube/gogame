@@ -1,0 +1,12 @@
+- queue system
+- server api
+- register/login
+- data models
+	- user
+	- planet
+	- ships
+	- galaxy
+- mongodb connectors
+- planet engine
+- building engine
+- battle engine
