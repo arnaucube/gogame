@@ -13,7 +13,8 @@ type Config struct {
 		AdminApi   string
 	}
 	Mongodb struct {
-		Url string
+		Url      string
+		Database string
 	}
 }
 
@@ -38,13 +39,5 @@ func MustRead(c *cli.Context) error {
 	if err := viper.Unmarshal(&C); err != nil {
 		return err
 	}
-	var err error
-	if C.Id, err = core.IDFromString(C.IdRaw); err != nil {
-		return err
-	}
-	if err := C.KeyStoreBaby.PubKey.UnmarshalText([]byte(C.KeyStoreBaby.PubKeyRaw)); err != nil {
-		return err
-	}
-	C.KeyStoreBaby.PubKeyComp = C.KeyStoreBaby.PubKey.Compress()
 	return nil
 }

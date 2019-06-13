@@ -8,6 +8,7 @@ type Resource struct {
 type User struct {
 	Id        string
 	Name      string
+	Password  string
 	Email     string
 	Resources struct {
 		Metal     Resource

@@ -3,8 +3,8 @@ package main
 import (
 	"os"
 
+	"github.com/arnaucube/gogame/cmd"
 	"github.com/fatih/color"
-	"github.com/gogame/cmd"
 	"github.com/urfave/cli"
 )
 

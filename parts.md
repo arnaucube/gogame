@@ -10,3 +10,4 @@
 - planet engine
 - building engine
 - battle engine
+- log system (console print and file save)
