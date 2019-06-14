@@ -29,13 +29,14 @@ func (srv Service) CreatePlanet(userId bson.ObjectId) (*models.SolarSystem, *mod
 		Size:    size,
 		Name:    name,
 		OwnerId: userId,
-		Buildings: models.BuildingsList{
-			MetalMine:     1,
-			CrystalMine:   1,
-			DeuteriumMine: 1,
-			EnergyMine:    1,
-		},
 	}
+	// in case that wants to start with resources plants
+	// newPlanet.Buildings = make(map[string]int64)
+	// newPlanet.Buildings["metalplant"] = 1
+	// newPlanet.Buildings["crystalplant"] = 1
+	// newPlanet.Buildings["deuteriumplant"] = 1
+	// newPlanet.Buildings["energyplant"] = 1
+
 	err := srv.db.Planets.Insert(newPlanet)
 	if err != nil {
 		return nil, nil, err
@@ -89,4 +90,27 @@ func (srv Service) PutPlanetInSolarSystem(position int64, planet *models.Planet)
 	err = srv.db.SolarSystems.Update(bson.M{"position": position}, solarSystem)
 
 	return &solarSystem, err
+}
+
+func (srv Service) UpgradeBuilding(user *models.User, planetid bson.ObjectId, building string) (*models.Planet, error) {
+	// get planet
+	var planet models.Planet
+	err := srv.db.Planets.Find(bson.M{"_id": planetid}).One(&planet)
+	if err != nil {
+		return nil, err
+	}
+
+	// get current building level, and get the needed resources for next level
+	resourcesNeeded := constants.BuildingsNeededResources[building][planet.Buildings[building]+1]
+
+	// if user have enough resources to upgrade the building, upgrade the building
+	err = user.SpendResources(resourcesNeeded)
+	if err != nil {
+		return nil, err
+	}
+	// upgrade level of building in planet
+	planet.Buildings[building] += 1
+	// store planet in db
+	err = srv.db.Planets.Update(bson.M{"_id": planet.Id}, planet)
+	return &planet, nil
 }

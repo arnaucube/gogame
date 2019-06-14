@@ -1,8 +1,11 @@
 package endpoint
 
 import (
+	"fmt"
+
 	"github.com/fatih/color"
 	"github.com/gin-gonic/gin"
+	"gopkg.in/mgo.v2/bson"
 )
 
 func fail(c *gin.Context, err error, msg string) {
@@ -64,19 +67,65 @@ func handleLogin(c *gin.Context) {
 func handleGetResources(c *gin.Context) {
 	userid := c.Param("userid")
 
-	user, err := userservice.GetUserById(userid)
+	user, err := userservice.GetUserById(bson.ObjectIdHex(userid))
 	if err != nil {
 		fail(c, err, "error on getting user")
 		return
 	}
 	resources, err := user.GetResources()
 	if err != nil {
-		fail(c, err, "error on getting user")
+		fail(c, err, "error on getting user resources")
 		return
 	}
 
 	c.JSON(200, gin.H{
 		"user":      user,
 		"resources": resources,
+	})
+}
+
+func handleGetUserPlanets(c *gin.Context) {
+	userid := c.Param("userid")
+
+	planets, err := userservice.GetUserPlanetsById(bson.ObjectIdHex(userid))
+	if err != nil {
+		fail(c, err, "error on getting user planets")
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"planets": planets,
+	})
+}
+
+type BuildMsg struct {
+	PlanetId string
+	Building string
+}
+
+func handlePostUpgradeBuilding(c *gin.Context) {
+	userid := c.Param("userid")
+	var buildMsg BuildMsg
+	err := c.BindJSON(&buildMsg)
+	if err != nil {
+		fail(c, err, "error parsing json")
+		return
+	}
+	fmt.Println(buildMsg)
+
+	user, err := userservice.GetUserById(bson.ObjectIdHex(userid))
+	if err != nil {
+		fail(c, err, "error on getting user")
+		return
+	}
+
+	planet, err := gameservice.UpgradeBuilding(user, bson.ObjectIdHex(buildMsg.PlanetId), buildMsg.Building)
+	if err != nil {
+		fail(c, err, "error upgrading building")
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"planet": planet,
 	})
 }

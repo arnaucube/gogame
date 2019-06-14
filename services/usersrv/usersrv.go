@@ -82,13 +82,22 @@ func (srv Service) Login(email, password string) (*string, *models.User, error) 
 	return &tokenString, user, err
 }
 
-func (srv Service) GetUserById(userid string) (*models.User, error) {
+func (srv Service) GetUserById(userid bson.ObjectId) (*models.User, error) {
 	var userDb models.UserDb
-	err := srv.db.Users.Find(bson.M{"_id": bson.ObjectIdHex(userid)}).One(&userDb)
+	err := srv.db.Users.Find(bson.M{"_id": userid}).One(&userDb)
 	if err != nil {
 		return nil, err
 	}
 	return models.UserDbToUser(srv.db, userDb), nil
+}
+
+func (srv Service) GetUserPlanetsById(userid bson.ObjectId) ([]*models.Planet, error) {
+	var planets []*models.Planet
+	err := srv.db.Planets.Find(bson.M{"ownerid": userid}).All(&planets)
+	if err != nil {
+		return nil, err
+	}
+	return planets, err
 }
 
 // func (srv Service) GetUser(id bson.ObjectId) (*models.User, error) {

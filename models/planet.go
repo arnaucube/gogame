@@ -2,7 +2,8 @@ package models
 
 import "gopkg.in/mgo.v2/bson"
 
-type BuildingsList struct {
+/*
+BuildingsList
 	MetalMine       int64
 	CrystalMine     int64
 	DeuteriumMine   int64
@@ -11,11 +12,11 @@ type BuildingsList struct {
 	RoboticsFactory int64
 	Shipyard        int64
 	RessearchLab    int64
-}
+*/
 type Planet struct {
 	Id        bson.ObjectId `json:"id" bson:"_id,omitempty"`
 	Size      int64         // fields/slots
 	Name      string
 	OwnerId   bson.ObjectId
-	Buildings BuildingsList
+	Buildings map[string]int64
 }

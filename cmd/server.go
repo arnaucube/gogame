@@ -35,7 +35,7 @@ func start(c *cli.Context) error {
 		return err
 	}
 
-	apiService := endpoint.Serve(config.C, db, userservice)
+	apiService := endpoint.Serve(config.C, db, userservice, gameservice)
 	apiService.Run(config.C.Server.ServiceApi)
 
 	return nil

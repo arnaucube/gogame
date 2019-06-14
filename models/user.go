@@ -1,6 +1,7 @@
 package models
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -42,6 +43,12 @@ func NewUser(db *database.Db, name, password, email string) (*User, error) {
 		Password:    password,
 		Email:       email,
 		LastUpdated: time.Now(),
+		Resources: Resources{
+			Metal:     500,
+			Crystal:   500,
+			Deuterium: 500,
+			Energy:    500,
+		},
 	}
 	err := db.Users.Insert(newUser)
 	if err != nil {
@@ -117,10 +124,10 @@ func (u *User) GetResources() (*Resources, error) {
 	for _, planet := range planets {
 		fmt.Println("planet", planet)
 		// TODO find correct formulas
-		metalGrowth = metalGrowth + ((1 + planet.Buildings.MetalMine) * int64(delta))
-		crystalGrowth = crystalGrowth + ((1 * planet.Buildings.CrystalMine) * int64(delta))
-		deuteriumGrowth = deuteriumGrowth + ((1 * planet.Buildings.DeuteriumMine) * int64(delta))
-		energyGrowth = energyGrowth + ((1 * planet.Buildings.EnergyMine) * int64(delta))
+		metalGrowth = metalGrowth + ((1 + planet.Buildings["metalmine"]) * int64(delta))
+		crystalGrowth = crystalGrowth + ((1 + planet.Buildings["crystalmine"]) * int64(delta))
+		deuteriumGrowth = deuteriumGrowth + ((1 + planet.Buildings["deuteriummine"]) * int64(delta))
+		energyGrowth = energyGrowth + ((1 + planet.Buildings["energymine"]) * int64(delta))
 	}
 	// calculate newAmount = oldAmount + growth
 	u.Resources.Metal = u.Resources.Metal + metalGrowth
@@ -136,4 +143,35 @@ func (u *User) GetResources() (*Resources, error) {
 
 	// return user
 	return &u.Resources, nil
+}
+
+// SpendResources checks if user has enough resources, then substracts the resources, and updates the amounts in the database
+func (u *User) SpendResources(r Resources) error {
+	err := u.GetFromDb()
+	if err != nil {
+		return err
+	}
+	if u.Resources.Metal < r.Metal {
+		return errors.New("not enough metal resources")
+	}
+	if u.Resources.Crystal < r.Crystal {
+		return errors.New("not enough crystal resources")
+	}
+	if u.Resources.Deuterium < r.Deuterium {
+		return errors.New("not enough deuterium resources")
+	}
+	if u.Resources.Energy < r.Energy {
+		return errors.New("not enough energy resources")
+	}
+
+	u.Resources.Metal = u.Resources.Metal - r.Metal
+	u.Resources.Crystal = u.Resources.Crystal - r.Crystal
+	u.Resources.Deuterium = u.Resources.Deuterium - r.Deuterium
+	u.Resources.Energy = u.Resources.Energy - r.Energy
+
+	err = u.StoreInDb()
+	if err != nil {
+		return err
+	}
+	return nil
 }
