@@ -31,8 +31,8 @@ func checkPasswordHash(password, hash string) bool {
 }
 
 func (srv Service) Register(name, password, email string) (*models.User, error) {
-	var user models.User
-	err := srv.db.Users.Find(bson.M{"email": email}).One(&user)
+	var userDb models.User
+	err := srv.db.Users.Find(bson.M{"email": email}).One(&userDb)
 	if err == nil {
 		return nil, errors.New("user already exist")
 	}
@@ -41,32 +41,22 @@ func (srv Service) Register(name, password, email string) (*models.User, error) 
 	if err != nil {
 		return nil, err
 	}
-	newUser := models.User{
-		Name:     name,
-		Password: hashedPassword,
-		Email:    email,
-	}
-	err = srv.db.Users.Insert(newUser)
-	if err != nil {
-		return nil, err
-	}
-	err = srv.db.Users.Find(bson.M{"email": email}).One(&user)
-	user.Password = ""
-	return &user, err
+	user, err := models.NewUser(srv.db, name, hashedPassword, email)
+	return user, err
 }
 
 var signingKey = []byte("TODO") // TODO
 
 func (srv Service) Login(email, password string) (*string, *models.User, error) {
-	var user models.User
-	err := srv.db.Users.Find(bson.M{"email": email}).One(&user)
+	var userDb models.UserDb
+	err := srv.db.Users.Find(bson.M{"email": email}).One(&userDb)
 	if err != nil {
 		return nil, nil, errors.New("user not exist")
 	}
-	if !checkPasswordHash(password, user.Password) {
+	if !checkPasswordHash(password, userDb.Password) {
 		return nil, nil, errors.New("error with password")
 	}
-	user.Password = ""
+	user := models.UserDbToUser(srv.db, userDb)
 
 	// create jwt
 	token := jwt.New(jwt.SigningMethodHS256)
@@ -80,5 +70,17 @@ func (srv Service) Login(email, password string) (*string, *models.User, error) 
 		return nil, nil, errors.New("error creating token")
 	}
 
-	return &tokenString, &user, err
+	return &tokenString, user, err
 }
+
+// func (srv Service) GetUser(id bson.ObjectId) (*models.User, error) {
+//         // update user stats
+//         user := getUserFromDB
+//         user.GetStats()
+//
+// }
+//
+// func (srv Service) GetUser(id bson.ObjectId) (*models.User, error) {
+//         // update user stats
+//
+// }

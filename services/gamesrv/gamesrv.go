@@ -3,6 +3,7 @@ package gamesrv
 import (
 	"fmt"
 
+	"github.com/arnaucube/gogame/constants"
 	"github.com/arnaucube/gogame/database"
 	"github.com/arnaucube/gogame/models"
 	"github.com/arnaucube/gogame/utils"
@@ -41,7 +42,7 @@ func (srv Service) CreatePlanet(userId bson.ObjectId) (*models.SolarSystem, *mod
 
 	// now put the planet in a solar system
 	// get random solar system
-	systemPosition := utils.RandInRange(0, models.GALAXYSIZE)
+	systemPosition := utils.RandInRange(0, constants.GALAXYSIZE)
 	solarSystem, err := srv.PutPlanetInSolarSystem(systemPosition, planet)
 	// TODO if error is returned because there is no empty slots for planets in the solar system in systemPosition, get another systemPosition and try again
 
@@ -54,9 +55,9 @@ func (srv Service) PutPlanetInSolarSystem(position int64, planet *models.Planet)
 	if err != nil {
 		// solar system non existing yet
 		// create a solarsystem with empty planets
-		var emptyPlanets []bson.ObjectId
-		for i := 0; i < models.SOLARSYSTEMSIZE; i++ {
-			emptyPlanets = append(emptyPlanets, "")
+		var emptyPlanets []string
+		for i := 0; i < constants.SOLARSYSTEMSIZE; i++ {
+			emptyPlanets = append(emptyPlanets, "empty")
 		}
 		newSolarSystem := models.SolarSystem{
 			Position: position,
@@ -71,16 +72,15 @@ func (srv Service) PutPlanetInSolarSystem(position int64, planet *models.Planet)
 		return &solarSystem, err
 	}
 	// get free slots in solarSystem
-	posInSolarSystem := utils.RandInRange(0, models.SOLARSYSTEMSIZE)
+	posInSolarSystem := utils.RandInRange(0, constants.SOLARSYSTEMSIZE)
 	if solarSystem.Planets[posInSolarSystem] != "" {
 		// not empty slot, take another one TODO
 		// if there are no empty slots, return error
 		fmt.Println("not empty slot")
 	}
 	// store planet in solar system
-	solarSystem.Planets[posInSolarSystem] = planet.Id
+	solarSystem.Planets[posInSolarSystem] = planet.Id.String()
 	err = srv.db.SolarSystems.Update(bson.M{"position": position}, solarSystem)
 
 	return &solarSystem, err
-
 }
