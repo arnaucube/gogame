@@ -29,6 +29,12 @@ func (srv Service) CreatePlanet(userId bson.ObjectId) (*models.SolarSystem, *mod
 		Size:    size,
 		Name:    name,
 		OwnerId: userId,
+		Buildings: models.BuildingsList{
+			MetalMine:     1,
+			CrystalMine:   1,
+			DeuteriumMine: 1,
+			EnergyMine:    1,
+		},
 	}
 	err := srv.db.Planets.Insert(newPlanet)
 	if err != nil {

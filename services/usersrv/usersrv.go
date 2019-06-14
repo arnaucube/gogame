@@ -6,18 +6,21 @@ import (
 
 	"github.com/arnaucube/gogame/database"
 	"github.com/arnaucube/gogame/models"
+	"github.com/arnaucube/gogame/services/gamesrv"
 	jwt "github.com/dgrijalva/jwt-go"
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/mgo.v2/bson"
 )
 
 type Service struct {
-	db *database.Db
+	db      *database.Db
+	gamesrv *gamesrv.Service
 }
 
-func New(db *database.Db) *Service {
+func New(db *database.Db, gameservice *gamesrv.Service) *Service {
 	return &Service{
-		db,
+		db:      db,
+		gamesrv: gameservice,
 	}
 }
 
@@ -42,6 +45,12 @@ func (srv Service) Register(name, password, email string) (*models.User, error) 
 		return nil, err
 	}
 	user, err := models.NewUser(srv.db, name, hashedPassword, email)
+	if err != nil {
+		return nil, err
+	}
+
+	_, _, err = srv.gamesrv.CreatePlanet(user.Id)
+
 	return user, err
 }
 
@@ -71,6 +80,15 @@ func (srv Service) Login(email, password string) (*string, *models.User, error) 
 	}
 
 	return &tokenString, user, err
+}
+
+func (srv Service) GetUserById(userid string) (*models.User, error) {
+	var userDb models.UserDb
+	err := srv.db.Users.Find(bson.M{"_id": bson.ObjectIdHex(userid)}).One(&userDb)
+	if err != nil {
+		return nil, err
+	}
+	return models.UserDbToUser(srv.db, userDb), nil
 }
 
 // func (srv Service) GetUser(id bson.ObjectId) (*models.User, error) {

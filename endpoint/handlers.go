@@ -60,3 +60,23 @@ func handleLogin(c *gin.Context) {
 		"user":  user,
 	})
 }
+
+func handleGetResources(c *gin.Context) {
+	userid := c.Param("userid")
+
+	user, err := userservice.GetUserById(userid)
+	if err != nil {
+		fail(c, err, "error on getting user")
+		return
+	}
+	resources, err := user.GetResources()
+	if err != nil {
+		fail(c, err, "error on getting user")
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"user":      user,
+		"resources": resources,
+	})
+}

@@ -65,7 +65,7 @@ func (u *User) StoreInDb() error {
 	userDb := UserDb{
 		Id:          u.Id,
 		Name:        u.Name,
-		LastUpdated: u.LastUpdated,
+		LastUpdated: time.Now(),
 		Resources:   u.Resources,
 	}
 	err := u.db.Users.Update(bson.M{"_id": u.Id}, userDb)
@@ -85,16 +85,16 @@ func (u *User) GetFromDb() error {
 
 func (u *User) GetPlanets() ([]Planet, error) {
 	var planets []Planet
-	err := u.db.Users.Find(bson.M{"OwnerId": u.Id}).All(&planets)
+	err := u.db.Planets.Find(bson.M{"ownerid": u.Id}).All(&planets)
 	if err != nil {
 		return planets, err
 	}
 	return planets, nil
 }
 
-// GetResources updates the values of resources and returns the value
+// GetResources updates the values of resources and returns the value, also updates the user.Resources
 // Resource types: metal, crystal, deuterium, energy
-func (u *User) GetResources() (*User, error) {
+func (u *User) GetResources() (*Resources, error) {
 	// get current values
 	err := u.GetFromDb()
 	if err != nil {
@@ -112,16 +112,17 @@ func (u *User) GetResources() (*User, error) {
 	}
 
 	// get Resource-Plant level in each planet
+	// and calculate growth = ResourcePlant.Level for each planet
 	var metalGrowth, crystalGrowth, deuteriumGrowth, energyGrowth int64
 	for _, planet := range planets {
-		// calculate growth = ResourcePlant.Level for each planet
+		fmt.Println("planet", planet)
 		// TODO find correct formulas
-		metalGrowth = metalGrowth + (planet.Buildings.MetalMine * int64(delta))
-		crystalGrowth = crystalGrowth + (planet.Buildings.CrystalMine * int64(delta))
-		deuteriumGrowth = deuteriumGrowth + (planet.Buildings.DeuteriumMine * int64(delta))
-		energyGrowth = energyGrowth + (planet.Buildings.EnergyMine * int64(delta))
+		metalGrowth = metalGrowth + ((1 + planet.Buildings.MetalMine) * int64(delta))
+		crystalGrowth = crystalGrowth + ((1 * planet.Buildings.CrystalMine) * int64(delta))
+		deuteriumGrowth = deuteriumGrowth + ((1 * planet.Buildings.DeuteriumMine) * int64(delta))
+		energyGrowth = energyGrowth + ((1 * planet.Buildings.EnergyMine) * int64(delta))
 	}
-	// calculate newAmount = oldAmount + (growth & DeltaTime)
+	// calculate newAmount = oldAmount + growth
 	u.Resources.Metal = u.Resources.Metal + metalGrowth
 	u.Resources.Crystal = u.Resources.Crystal + crystalGrowth
 	u.Resources.Deuterium = u.Resources.Deuterium + deuteriumGrowth
@@ -134,5 +135,5 @@ func (u *User) GetResources() (*User, error) {
 	}
 
 	// return user
-	return u, nil
+	return &u.Resources, nil
 }

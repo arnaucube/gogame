@@ -19,6 +19,9 @@ func newApiService() *gin.Engine {
 	api.GET("/info", handleInfo)
 	api.POST("/register", handleRegister)
 	api.POST("/login", handleLogin)
+
+	// TODO add jwt checker
+	api.GET("/resources/:userid", handleGetResources)
 	return api
 }
 

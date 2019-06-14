@@ -7,10 +7,9 @@ import requests
 import provoj
 import time
 
-import subprocess
-subprocess.check_call(["mongo", "gogame", "--eval", "'db.dropDatabase()'"])
+import os
+os.system("mongo gogame --eval 'db.dropDatabase()'")
 
-time.sleep(1)
 
 URL = "http://127.0.0.1:5000"
 
@@ -26,7 +25,6 @@ t.rStatus("post /register", r)
 jsonR = r.json()
 print(jsonR)
 
-time.sleep(1)
 
 loginData = {
     "email": "user00@email.com",
@@ -37,6 +35,17 @@ t.rStatus("post /login", r)
 jsonR = r.json()
 print(jsonR)
 
+userid = jsonR["user"]["id"]
+r = requests.get(URL + "/resources/"+ userid)
+t.rStatus("get /resources", r)
+jsonR = r.json()
+print(jsonR)
+
+time.sleep(4)
+r = requests.get(URL + "/resources/"+ userid)
+t.rStatus("get /resources", r)
+jsonR = r.json()
+print(jsonR)
 
 t.printScores()
 

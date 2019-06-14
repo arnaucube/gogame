@@ -4,6 +4,7 @@ import (
 	"github.com/arnaucube/gogame/config"
 	"github.com/arnaucube/gogame/database"
 	"github.com/arnaucube/gogame/endpoint"
+	"github.com/arnaucube/gogame/services/gamesrv"
 	"github.com/arnaucube/gogame/services/usersrv"
 	"github.com/urfave/cli"
 )
@@ -28,7 +29,8 @@ func start(c *cli.Context) error {
 	}
 
 	// services
-	userservice := usersrv.New(db)
+	gameservice := gamesrv.New(db)
+	userservice := usersrv.New(db, gameservice)
 	if err != nil {
 		return err
 	}
