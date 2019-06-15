@@ -60,3 +60,6 @@ var BuildingsNeededResources = map[string]map[int64]models.Resources{
 		},
 	},
 }
+
+// extra
+const JWTIdKey = "id"

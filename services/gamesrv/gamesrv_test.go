@@ -1,14 +1,6 @@
 package gamesrv
 
-import (
-	"fmt"
-	"testing"
-
-	"github.com/arnaucube/gogame/database"
-	"github.com/stretchr/testify/assert"
-	"gopkg.in/mgo.v2/bson"
-)
-
+/*
 func TestCreatePlanet(t *testing.T) {
 	db, err := database.New("127.0.0.1:27017", "gogametests")
 	assert.Nil(t, err)
@@ -19,3 +11,4 @@ func TestCreatePlanet(t *testing.T) {
 	fmt.Println(solarSystem)
 	fmt.Println(planet)
 }
+*/

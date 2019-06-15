@@ -35,24 +35,27 @@ t.rStatus("post /login", r)
 jsonR = r.json()
 print(jsonR)
 
+token = jsonR["token"]
+headers = {"Authorization": "Bearer " + token}
+
+r = requests.get(URL + "/", headers=headers)
+t.rStatus("get /", r)
+jsonR = r.json()
+print(jsonR)
+
 userid = jsonR["user"]["id"]
-r = requests.get(URL + "/resources/"+ userid)
+r = requests.get(URL + "/resources", headers=headers)
 t.rStatus("get /resources", r)
 jsonR = r.json()
 print(jsonR)
 
 time.sleep(1)
-r = requests.get(URL + "/resources/"+ userid)
+r = requests.get(URL + "/resources", headers=headers)
 t.rStatus("get /resources", r)
 jsonR = r.json()
 print(jsonR)
 
-r = requests.get(URL + "/resources/"+ userid)
-t.rStatus("get /resources", r)
-jsonR = r.json()
-print(jsonR)
-
-r = requests.get(URL + "/planets/"+userid)
+r = requests.get(URL + "/planets", headers=headers)
 t.rStatus("post /planets/:userid", r)
 jsonR = r.json()
 print(jsonR)
@@ -63,7 +66,7 @@ d = {
         "planetid": planetid,
         "building": "metalplant",
 }
-r = requests.post(URL + "/buildings/"+userid, json=d)
+r = requests.post(URL + "/buildings", json=d, headers=headers)
 t.rStatus("post /building/:userid", r)
 jsonR = r.json()
 print(jsonR)
@@ -72,7 +75,7 @@ d = {
         "planetid": planetid,
         "building": "ressearchlab",
 }
-r = requests.post(URL + "/buildings/"+userid, json=d)
+r = requests.post(URL + "/buildings", json=d, headers=headers)
 t.rStatus("post /building/:userid", r)
 jsonR = r.json()
 print(jsonR)

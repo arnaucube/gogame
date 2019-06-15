@@ -2,7 +2,6 @@ package models
 
 import (
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/arnaucube/gogame/database"
@@ -107,8 +106,6 @@ func (u *User) GetResources() (*Resources, error) {
 	if err != nil {
 		return nil, err
 	}
-	// get u.LastUpdated
-	fmt.Println(u.LastUpdated)
 	// calculate Delta time = currentTime - u.LastUpdated
 	delta := time.Since(u.LastUpdated)
 
@@ -122,7 +119,6 @@ func (u *User) GetResources() (*Resources, error) {
 	// and calculate growth = ResourcePlant.Level for each planet
 	var metalGrowth, crystalGrowth, deuteriumGrowth, energyGrowth int64
 	for _, planet := range planets {
-		fmt.Println("planet", planet)
 		// TODO find correct formulas
 		metalGrowth = metalGrowth + ((1 + planet.Buildings["metalmine"]) * int64(delta))
 		crystalGrowth = crystalGrowth + ((1 + planet.Buildings["crystalmine"]) * int64(delta))

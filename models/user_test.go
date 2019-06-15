@@ -1,12 +1,6 @@
 package models
 
-import (
-	"testing"
-
-	"github.com/arnaucube/gogame/database"
-	"github.com/stretchr/testify/assert"
-)
-
+/*
 func TestCreateUser(t *testing.T) {
 	db, err := database.New("127.0.0.1:27017", "gogametests")
 	assert.Nil(t, err)
@@ -15,3 +9,4 @@ func TestCreateUser(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, user.Name, "user00")
 }
+*/

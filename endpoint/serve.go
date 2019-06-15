@@ -1,12 +1,19 @@
 package endpoint
 
 import (
+	"log"
+	"time"
+
+	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/arnaucube/gogame/config"
+	"github.com/arnaucube/gogame/constants"
 	"github.com/arnaucube/gogame/database"
+	"github.com/arnaucube/gogame/models"
 	"github.com/arnaucube/gogame/services/gamesrv"
 	"github.com/arnaucube/gogame/services/usersrv"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"gopkg.in/mgo.v2/bson"
 )
 
 var serverConfig config.Config
@@ -17,15 +24,74 @@ var gameservice *gamesrv.Service
 func newApiService() *gin.Engine {
 	api := gin.Default()
 	api.Use(cors.Default())
-	api.GET("/", handleMain)
+
+	// the jwt middleware
+	authMiddleware, err := jwt.New(&jwt.GinJWTMiddleware{
+		Realm:       "test zone",
+		Key:         []byte("secret key"),
+		Timeout:     time.Hour,
+		MaxRefresh:  time.Hour,
+		IdentityKey: constants.JWTIdKey,
+		PayloadFunc: func(data interface{}) jwt.MapClaims {
+			if v, ok := data.(*models.User); ok {
+				return jwt.MapClaims{
+					constants.JWTIdKey: v.Id,
+				}
+			}
+			return jwt.MapClaims{}
+		},
+		IdentityHandler: func(c *gin.Context) interface{} {
+			claims := jwt.ExtractClaims(c)
+			userid := bson.ObjectIdHex(claims[constants.JWTIdKey].(string))
+			return &models.User{
+				Id: userid,
+			}
+		},
+		Authenticator: func(c *gin.Context) (interface{}, error) {
+			var loginMsg LoginMsg
+			if err := c.ShouldBind(&loginMsg); err != nil {
+				return "", jwt.ErrMissingLoginValues
+			}
+
+			_, user, err := userservice.Login(loginMsg.Email, loginMsg.Password)
+			if err != nil {
+				fail(c, err, jwt.ErrFailedAuthentication.Error())
+				return "", err
+			}
+			return user, nil
+
+		},
+		Unauthorized: func(c *gin.Context, code int, message string) {
+			c.JSON(code, gin.H{
+				"code":    code,
+				"message": message,
+			})
+		},
+		TokenLookup: "header: Authorization",
+
+		// TokenHeadName is a string in the header. Default value is "Bearer"
+		TokenHeadName: "Bearer",
+
+		// TimeFunc provides the current time. You can override it to use another time value. This is useful for testing or if your server uses a different time zone than your tokens.
+		TimeFunc: time.Now,
+	})
+	if err != nil {
+		log.Fatal("JWT Error:" + err.Error())
+	}
+
 	api.GET("/info", handleInfo)
 	api.POST("/register", handleRegister)
-	api.POST("/login", handleLogin)
+	// api.POST("/login", handleLogin)
+	api.POST("/login", authMiddleware.LoginHandler)
+	api.GET("/refresh_token", authMiddleware.RefreshHandler)
 
-	// TODO add jwt checker
-	api.GET("/resources/:userid", handleGetResources)
-	api.GET("/planets/:userid", handleGetUserPlanets)
-	api.POST("/buildings/:userid", handlePostUpgradeBuilding)
+	api.Use(authMiddleware.MiddlewareFunc())
+	{
+		api.GET("/", handleGetUser)
+		api.GET("/resources", handleGetResources)
+		api.GET("/planets", handleGetUserPlanets)
+		api.POST("/buildings", handlePostUpgradeBuilding)
+	}
 	return api
 }
 

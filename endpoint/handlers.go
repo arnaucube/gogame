@@ -1,8 +1,8 @@
 package endpoint
 
 import (
-	"fmt"
-
+	jwt "github.com/appleboy/gin-jwt/v2"
+	"github.com/arnaucube/gogame/constants"
 	"github.com/fatih/color"
 	"github.com/gin-gonic/gin"
 	"gopkg.in/mgo.v2/bson"
@@ -64,10 +64,32 @@ func handleLogin(c *gin.Context) {
 	})
 }
 
-func handleGetResources(c *gin.Context) {
-	userid := c.Param("userid")
+func handleGetUser(c *gin.Context) {
+	claims := jwt.ExtractClaims(c)
+	userid := bson.ObjectIdHex(claims[constants.JWTIdKey].(string))
 
-	user, err := userservice.GetUserById(bson.ObjectIdHex(userid))
+	user, err := userservice.GetUserById(userid)
+	if err != nil {
+		fail(c, err, "error on getting user")
+		return
+	}
+	resources, err := user.GetResources()
+	if err != nil {
+		fail(c, err, "error on getting user resources")
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"user":      user,
+		"resources": resources,
+	})
+}
+
+func handleGetResources(c *gin.Context) {
+	claims := jwt.ExtractClaims(c)
+	userid := bson.ObjectIdHex(claims[constants.JWTIdKey].(string))
+
+	user, err := userservice.GetUserById(userid)
 	if err != nil {
 		fail(c, err, "error on getting user")
 		return
@@ -85,9 +107,10 @@ func handleGetResources(c *gin.Context) {
 }
 
 func handleGetUserPlanets(c *gin.Context) {
-	userid := c.Param("userid")
+	claims := jwt.ExtractClaims(c)
+	userid := bson.ObjectIdHex(claims[constants.JWTIdKey].(string))
 
-	planets, err := userservice.GetUserPlanetsById(bson.ObjectIdHex(userid))
+	planets, err := userservice.GetUserPlanetsById(userid)
 	if err != nil {
 		fail(c, err, "error on getting user planets")
 		return
@@ -104,16 +127,16 @@ type BuildMsg struct {
 }
 
 func handlePostUpgradeBuilding(c *gin.Context) {
-	userid := c.Param("userid")
+	claims := jwt.ExtractClaims(c)
+	userid := bson.ObjectIdHex(claims[constants.JWTIdKey].(string))
 	var buildMsg BuildMsg
 	err := c.BindJSON(&buildMsg)
 	if err != nil {
 		fail(c, err, "error parsing json")
 		return
 	}
-	fmt.Println(buildMsg)
 
-	user, err := userservice.GetUserById(bson.ObjectIdHex(userid))
+	user, err := userservice.GetUserById(userid)
 	if err != nil {
 		fail(c, err, "error on getting user")
 		return
