@@ -91,7 +91,9 @@ func (srv Service) GetUserById(userid bson.ObjectId) (*models.User, error) {
 	if err != nil {
 		return nil, err
 	}
-	return models.UserDbToUser(srv.db, userDb), nil
+	user := models.UserDbToUser(srv.db, userDb)
+	_, err = user.GetResources()
+	return user, err
 }
 
 func (srv Service) GetUserPlanetsById(userid bson.ObjectId) ([]*models.Planet, error) {
@@ -102,15 +104,3 @@ func (srv Service) GetUserPlanetsById(userid bson.ObjectId) ([]*models.Planet, e
 	}
 	return planets, err
 }
-
-// func (srv Service) GetUser(id bson.ObjectId) (*models.User, error) {
-//         // update user stats
-//         user := getUserFromDB
-//         user.GetStats()
-//
-// }
-//
-// func (srv Service) GetUser(id bson.ObjectId) (*models.User, error) {
-//         // update user stats
-//
-// }

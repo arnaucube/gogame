@@ -181,8 +181,26 @@ func (u *User) GetBuildingCost(planet Planet, building string) (Resources, error
 		return DeuteriumMineCost(planet.Buildings["deuteriummine"] + 1), nil
 	case "energymine":
 		return EnergyMineCost(planet.Buildings["energymine"] + 1), nil
+	case "fusionreactor":
+		return FussionReactorCost(planet.Buildings["fusionreactor"] + 1), nil
+	case "roboticsfactory":
+		return RoboticsFactoryCost(planet.Buildings["roboticsfactory"] + 1), nil
+	case "shipyard":
+		return ShipyardCost(planet.Buildings["shipyard"] + 1), nil
+	case "metalstorage":
+		return MetalStorageCost(planet.Buildings["metalstorage"] + 1), nil
+	case "crystalstorage":
+		return CrystalStorageCost(planet.Buildings["crystalstorage"] + 1), nil
+	case "deuteriumstorage":
+		return DeuteriumStorageCost(planet.Buildings["deuteriumstorage"] + 1), nil
 	case "ressearchlab":
 		return RessearchLabCost(planet.Buildings["ressearchlab"] + 1), nil
+	case "alliancedepot":
+		return AllianceDepotCost(planet.Buildings["alliancedepot"] + 1), nil
+	case "missilesilo":
+		return MissileSiloCost(planet.Buildings["missilesilo"] + 1), nil
+	case "spacedock":
+		return SpaceDockCost(planet.Buildings["spacedock"] + 1), nil
 	default:
 		return Resources{}, errors.New("building not found")
 	}
