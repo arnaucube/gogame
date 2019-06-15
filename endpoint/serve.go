@@ -23,7 +23,13 @@ var gameservice *gamesrv.Service
 
 func newApiService() *gin.Engine {
 	api := gin.Default()
-	api.Use(cors.Default())
+	api.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://127.0.0.1:8080"},
+		AllowMethods:     []string{"GET", "POST"},
+		AllowHeaders:     []string{"Authorization", "Content-Type"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
 
 	// the jwt middleware
 	authMiddleware, err := jwt.New(&jwt.GinJWTMiddleware{

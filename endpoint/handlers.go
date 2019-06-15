@@ -27,9 +27,9 @@ func handleInfo(c *gin.Context) {
 }
 
 type RegisterMsg struct {
-	Name     string `binding:"required"`
-	Password string `binding:"required"`
-	Email    string `binding:"required"`
+	Name     string `json:"name" binding:"required"`
+	Password string `json:"password" binding:"required"`
+	Email    string `json:"email" binding:"required"`
 }
 
 func handleRegister(c *gin.Context) {

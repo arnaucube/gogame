@@ -3,3 +3,5 @@
 Nostalgic OGame clone in Go
 
 WIP
+
+The frontend is in https://github.com/arnaucube/gogame-frontend
