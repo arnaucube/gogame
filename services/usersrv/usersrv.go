@@ -49,7 +49,10 @@ func (srv Service) Register(name, password, email string) (*models.User, error) 
 		return nil, err
 	}
 
-	_, _, err = srv.gamesrv.CreatePlanet(user.Id)
+	_, planet, err := srv.gamesrv.CreatePlanet(user.Id)
+
+	user.Planets = append(user.Planets, planet.Id)
+	user.StoreInDb()
 
 	return user, err
 }

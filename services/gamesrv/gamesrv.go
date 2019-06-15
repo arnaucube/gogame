@@ -92,6 +92,15 @@ func (srv Service) PutPlanetInSolarSystem(position int64, planet *models.Planet)
 	return &solarSystem, err
 }
 
+func (srv Service) GetBuildings(user *models.User, planetid bson.ObjectId) (*models.Planet, error) {
+	var planet models.Planet
+	err := srv.db.Planets.Find(bson.M{"_id": planetid, "ownerid": user.Id}).One(&planet)
+	if err != nil {
+		return nil, err
+	}
+	return &planet, nil
+}
+
 func (srv Service) UpgradeBuilding(user *models.User, planetid bson.ObjectId, building string) (*models.Planet, error) {
 	// get planet
 	var planet models.Planet

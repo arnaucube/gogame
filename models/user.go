@@ -33,6 +33,7 @@ type User struct {
 	LastUpdated time.Time
 	db          *database.Db
 	Resources   Resources
+	Planets     []bson.ObjectId
 }
 
 func NewUser(db *database.Db, name, password, email string) (*User, error) {
@@ -64,17 +65,16 @@ func UserDbToUser(db *database.Db, u UserDb) *User {
 		LastUpdated: u.LastUpdated,
 		db:          db,
 		Resources:   u.Resources,
+		Planets:     u.Planets,
 	}
 }
 
 func (u *User) StoreInDb() error {
-	userDb := UserDb{
-		Id:          u.Id,
-		Name:        u.Name,
-		LastUpdated: time.Now(),
-		Resources:   u.Resources,
-	}
-	err := u.db.Users.Update(bson.M{"_id": u.Id}, userDb)
+	err := u.db.Users.Update(bson.M{"_id": u.Id}, bson.M{"$set": bson.M{
+		"lastupdated": time.Now(),
+		"resources":   u.Resources,
+		"planets":     u.Planets,
+	}})
 	return err
 
 }

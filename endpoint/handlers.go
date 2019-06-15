@@ -121,6 +121,28 @@ func handleGetUserPlanets(c *gin.Context) {
 	})
 }
 
+func handleGetPlanet(c *gin.Context) {
+	claims := jwt.ExtractClaims(c)
+	userid := bson.ObjectIdHex(claims[constants.JWTIdKey].(string))
+	planetid := c.Param("planetid")
+
+	user, err := userservice.GetUserById(userid)
+	if err != nil {
+		fail(c, err, "error on getting user")
+		return
+	}
+
+	planet, err := gameservice.GetBuildings(user, bson.ObjectIdHex(planetid))
+	if err != nil {
+		fail(c, err, "error upgrading building")
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"planet": planet,
+	})
+}
+
 type BuildMsg struct {
 	PlanetId string
 	Building string

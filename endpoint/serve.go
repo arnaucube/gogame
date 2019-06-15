@@ -96,6 +96,7 @@ func newApiService() *gin.Engine {
 		api.GET("/", handleGetUser)
 		api.GET("/resources", handleGetResources)
 		api.GET("/planets", handleGetUserPlanets)
+		api.GET("/planets/:planetid", handleGetPlanet)
 		api.POST("/buildings", handlePostUpgradeBuilding)
 	}
 	return api
