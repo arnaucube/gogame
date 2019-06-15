@@ -31,11 +31,11 @@ func (srv Service) CreatePlanet(userId bson.ObjectId) (*models.SolarSystem, *mod
 		OwnerId: userId,
 	}
 	// in case that wants to start with resources plants
-	// newPlanet.Buildings = make(map[string]int64)
-	// newPlanet.Buildings["metalplant"] = 1
-	// newPlanet.Buildings["crystalplant"] = 1
-	// newPlanet.Buildings["deuteriumplant"] = 1
-	// newPlanet.Buildings["energyplant"] = 1
+	newPlanet.Buildings = make(map[string]int64)
+	newPlanet.Buildings["metalmine"] = 1
+	newPlanet.Buildings["crystalmine"] = 1
+	newPlanet.Buildings["deuteriummine"] = 1
+	newPlanet.Buildings["energymine"] = 1
 
 	err := srv.db.Planets.Insert(newPlanet)
 	if err != nil {
@@ -101,8 +101,13 @@ func (srv Service) UpgradeBuilding(user *models.User, planetid bson.ObjectId, bu
 	}
 
 	// get current building level, and get the needed resources for next level
-	resourcesNeeded := constants.BuildingsNeededResources[building][planet.Buildings[building]+1]
+	resourcesNeeded, err := user.GetBuildingCost(planet, building)
+	if err != nil {
+		return nil, err
+	}
 
+	fmt.Println("bui", building)
+	fmt.Println("needed", resourcesNeeded)
 	// if user have enough resources to upgrade the building, upgrade the building
 	err = user.SpendResources(resourcesNeeded)
 	if err != nil {

@@ -73,15 +73,15 @@ func handleGetUser(c *gin.Context) {
 		fail(c, err, "error on getting user")
 		return
 	}
-	resources, err := user.GetResources()
-	if err != nil {
-		fail(c, err, "error on getting user resources")
-		return
-	}
+	// resources, err := user.GetResources()
+	// if err != nil {
+	//         fail(c, err, "error on getting user resources")
+	//         return
+	// }
 
 	c.JSON(200, gin.H{
-		"user":      user,
-		"resources": resources,
+		"user": user,
+		// "resources": resources,
 	})
 }
 

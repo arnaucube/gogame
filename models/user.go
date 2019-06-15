@@ -107,7 +107,7 @@ func (u *User) GetResources() (*Resources, error) {
 		return nil, err
 	}
 	// calculate Delta time = currentTime - u.LastUpdated
-	delta := time.Since(u.LastUpdated)
+	delta := time.Since(u.LastUpdated).Seconds()
 
 	// get planets
 	planets, err := u.GetPlanets()
@@ -119,11 +119,10 @@ func (u *User) GetResources() (*Resources, error) {
 	// and calculate growth = ResourcePlant.Level for each planet
 	var metalGrowth, crystalGrowth, deuteriumGrowth, energyGrowth int64
 	for _, planet := range planets {
-		// TODO find correct formulas
-		metalGrowth = metalGrowth + ((1 + planet.Buildings["metalmine"]) * int64(delta))
-		crystalGrowth = crystalGrowth + ((1 + planet.Buildings["crystalmine"]) * int64(delta))
-		deuteriumGrowth = deuteriumGrowth + ((1 + planet.Buildings["deuteriummine"]) * int64(delta))
-		energyGrowth = energyGrowth + ((1 + planet.Buildings["energymine"]) * int64(delta))
+		metalGrowth = metalGrowth + MetalGrowth(planet.Buildings["metalmine"], int64(delta))
+		crystalGrowth = crystalGrowth + MetalGrowth(planet.Buildings["crystalmine"], int64(delta))
+		deuteriumGrowth = deuteriumGrowth + MetalGrowth(planet.Buildings["deuteriummine"], int64(delta))
+		energyGrowth = energyGrowth + MetalGrowth(planet.Buildings["energymine"], int64(delta))
 	}
 	// calculate newAmount = oldAmount + growth
 	u.Resources.Metal = u.Resources.Metal + metalGrowth
@@ -170,4 +169,22 @@ func (u *User) SpendResources(r Resources) error {
 		return err
 	}
 	return nil
+}
+
+func (u *User) GetBuildingCost(planet Planet, building string) (Resources, error) {
+	switch building {
+	case "metalmine":
+		return MetalMineCost(planet.Buildings["metalmine"] + 1), nil
+	case "crystalmine":
+		return CrystalMineCost(planet.Buildings["crystalmine"] + 1), nil
+	case "deuteriummine":
+		return DeuteriumMineCost(planet.Buildings["deuteriummine"] + 1), nil
+	case "energymine":
+		return EnergyMineCost(planet.Buildings["energymine"] + 1), nil
+	case "ressearchlab":
+		return RessearchLabCost(planet.Buildings["ressearchlab"] + 1), nil
+	default:
+		return Resources{}, errors.New("building not found")
+	}
+
 }

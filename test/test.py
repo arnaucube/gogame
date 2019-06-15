@@ -56,7 +56,7 @@ jsonR = r.json()
 print(jsonR)
 
 r = requests.get(URL + "/planets", headers=headers)
-t.rStatus("post /planets/:userid", r)
+t.rStatus("post /planets", r)
 jsonR = r.json()
 print(jsonR)
 print(jsonR["planets"][0])
@@ -64,10 +64,10 @@ planetid = jsonR["planets"][0]["id"]
 
 d = {
         "planetid": planetid,
-        "building": "metalplant",
+        "building": "metalmine",
 }
 r = requests.post(URL + "/buildings", json=d, headers=headers)
-t.rStatus("post /building/:userid", r)
+t.rStatus("post /building", r)
 jsonR = r.json()
 print(jsonR)
 
@@ -76,7 +76,13 @@ d = {
         "building": "ressearchlab",
 }
 r = requests.post(URL + "/buildings", json=d, headers=headers)
-t.rStatus("post /building/:userid", r)
+t.rStatus("post /building", r)
+jsonR = r.json()
+print(jsonR)
+
+time.sleep(1)
+r = requests.get(URL + "/resources", headers=headers)
+t.rStatus("get /resources", r)
 jsonR = r.json()
 print(jsonR)
 
