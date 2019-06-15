@@ -132,6 +132,103 @@ func EnergyMineCost(ilvl int64) Resources {
 	return cost
 }
 
+func FussionReactorCost(ilvl int64) Resources {
+	lvl := float64(ilvl)
+	base := Resources{
+		Metal:     900,
+		Crystal:   360,
+		Deuterium: 180,
+		Energy:    0,
+	}
+	// cost = base * 1.8^(lvl-1)
+	cost := Resources{}
+	cost.Metal = int64(float64(base.Metal) * math.Pow(1.8, lvl-1))
+	cost.Crystal = int64(float64(base.Crystal) * math.Pow(1.8, lvl-1))
+	cost.Deuterium = int64(float64(base.Deuterium) * math.Pow(1.8, lvl-1))
+	cost.Energy = int64(float64(base.Energy) * math.Pow(1.8, lvl-1))
+	return cost
+}
+func RoboticsFactoryCost(ilvl int64) Resources {
+	lvl := float64(ilvl)
+	base := Resources{
+		Metal:     400,
+		Crystal:   120,
+		Deuterium: 200,
+		Energy:    0,
+	}
+	// cost = base * 2^(lvl-1)
+	cost := Resources{}
+	cost.Metal = int64(float64(base.Metal) * math.Pow(2, lvl-1))
+	cost.Crystal = int64(float64(base.Crystal) * math.Pow(2, lvl-1))
+	cost.Deuterium = int64(float64(base.Deuterium) * math.Pow(2, lvl-1))
+	cost.Energy = int64(float64(base.Energy) * math.Pow(2, lvl-1))
+	return cost
+}
+func ShipyardCost(ilvl int64) Resources {
+	lvl := float64(ilvl)
+	base := Resources{
+		Metal:     400,
+		Crystal:   200,
+		Deuterium: 100,
+		Energy:    0,
+	}
+	// cost = base * 2^(lvl-1)
+	cost := Resources{}
+	cost.Metal = int64(float64(base.Metal) * math.Pow(2, lvl-1))
+	cost.Crystal = int64(float64(base.Crystal) * math.Pow(2, lvl-1))
+	cost.Deuterium = int64(float64(base.Deuterium) * math.Pow(2, lvl-1))
+	cost.Energy = int64(float64(base.Energy) * math.Pow(2, lvl-1))
+	return cost
+}
+func MetalStorageCost(ilvl int64) Resources {
+	lvl := float64(ilvl)
+	base := Resources{
+		Metal:     1000,
+		Crystal:   0,
+		Deuterium: 0,
+		Energy:    0,
+	}
+	// cost = base * 2^(lvl-1)
+	cost := Resources{}
+	cost.Metal = int64(float64(base.Metal) * math.Pow(2, lvl-1))
+	cost.Crystal = 0
+	cost.Deuterium = 0
+	cost.Energy = 0
+	return cost
+}
+func CrystalStorageCost(ilvl int64) Resources {
+	lvl := float64(ilvl)
+	base := Resources{
+		Metal:     1000,
+		Crystal:   500,
+		Deuterium: 0,
+		Energy:    0,
+	}
+	// cost = base * 2^(lvl-1)
+	cost := Resources{}
+	cost.Metal = int64(float64(base.Metal) * math.Pow(2, lvl-1))
+	cost.Crystal = int64(float64(base.Crystal) * math.Pow(2, lvl-1))
+	cost.Deuterium = 0
+	cost.Energy = 0
+	return cost
+}
+func DeuteriumStorageCost(ilvl int64) Resources {
+	lvl := float64(ilvl)
+	base := Resources{
+		Metal:     1000,
+		Crystal:   1000,
+		Deuterium: 0,
+		Energy:    0,
+	}
+	// cost = base * 2^(lvl-1)
+	cost := Resources{}
+	cost.Metal = int64(float64(base.Metal) * math.Pow(2, lvl-1))
+	cost.Crystal = int64(float64(base.Crystal) * math.Pow(2, lvl-1))
+	cost.Deuterium = int64(float64(base.Deuterium) * math.Pow(2, lvl-1))
+	cost.Energy = int64(float64(base.Energy) * math.Pow(2, lvl-1))
+	return cost
+}
+
 func RessearchLabCost(ilvl int64) Resources {
 	lvl := float64(ilvl)
 	base := Resources{
@@ -140,7 +237,55 @@ func RessearchLabCost(ilvl int64) Resources {
 		Deuterium: 200,
 		Energy:    0,
 	}
-	// cost = base * 1.5^(lvl-1)
+	// cost = base * 2^(lvl-1)
+	cost := Resources{}
+	cost.Metal = int64(float64(base.Metal) * math.Pow(2, lvl-1))
+	cost.Crystal = int64(float64(base.Crystal) * math.Pow(2, lvl-1))
+	cost.Deuterium = int64(float64(base.Deuterium) * math.Pow(2, lvl-1))
+	cost.Energy = int64(float64(base.Energy) * math.Pow(2, lvl-1))
+	return cost
+}
+func AllianceDepotCost(ilvl int64) Resources {
+	lvl := float64(ilvl)
+	base := Resources{
+		Metal:     20000,
+		Crystal:   40000,
+		Deuterium: 0,
+		Energy:    0,
+	}
+	// cost = base * 2^(lvl-1)
+	cost := Resources{}
+	cost.Metal = int64(float64(base.Metal) * math.Pow(2, lvl-1))
+	cost.Crystal = int64(float64(base.Crystal) * math.Pow(2, lvl-1))
+	cost.Deuterium = int64(float64(base.Deuterium) * math.Pow(2, lvl-1))
+	cost.Energy = int64(float64(base.Energy) * math.Pow(2, lvl-1))
+	return cost
+}
+func MissileSiloCost(ilvl int64) Resources {
+	lvl := float64(ilvl)
+	base := Resources{
+		Metal:     20000,
+		Crystal:   20000,
+		Deuterium: 1000,
+		Energy:    0,
+	}
+	// cost = base * 2^(lvl-1)
+	cost := Resources{}
+	cost.Metal = int64(float64(base.Metal) * math.Pow(2, lvl-1))
+	cost.Crystal = int64(float64(base.Crystal) * math.Pow(2, lvl-1))
+	cost.Deuterium = int64(float64(base.Deuterium) * math.Pow(2, lvl-1))
+	cost.Energy = int64(float64(base.Energy) * math.Pow(2, lvl-1))
+	return cost
+}
+func SpaceDockCost(ilvl int64) Resources {
+	lvl := float64(ilvl)
+	base := Resources{
+		Metal:     20000,
+		Crystal:   20000,
+		Deuterium: 1000,
+		Energy:    0,
+	}
+	// cost = base * 2^(lvl-1)
 	cost := Resources{}
 	cost.Metal = int64(float64(base.Metal) * math.Pow(2, lvl-1))
 	cost.Crystal = int64(float64(base.Crystal) * math.Pow(2, lvl-1))

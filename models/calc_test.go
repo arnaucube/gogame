@@ -55,8 +55,53 @@ func TestMineCost(t *testing.T) {
 	assert.Equal(t, Resources{Metal: 112, Crystal: 45}, EnergyMineCost(2))
 	assert.Equal(t, Resources{Metal: 21894, Crystal: 8757}, EnergyMineCost(15))
 
+	// FussionReactorCost
+	assert.Equal(t, Resources{Metal: 900, Crystal: 360, Deuterium: 180}, FussionReactorCost(1))
+	assert.Equal(t, Resources{Metal: 1620, Crystal: 648, Deuterium: 324}, FussionReactorCost(2))
+	assert.Equal(t, Resources{Metal: 3373320, Crystal: 1349328, Deuterium: 674664}, FussionReactorCost(15))
+
+	// roboticsfactory
+	assert.Equal(t, Resources{Metal: 400, Crystal: 120, Deuterium: 200}, RoboticsFactoryCost(1))
+	assert.Equal(t, Resources{Metal: 800, Crystal: 240, Deuterium: 400}, RoboticsFactoryCost(2))
+	assert.Equal(t, Resources{Metal: 6553600, Crystal: 1966080, Deuterium: 3276800}, RoboticsFactoryCost(15))
+
+	// shipyard
+	assert.Equal(t, Resources{Metal: 400, Crystal: 200, Deuterium: 100}, ShipyardCost(1))
+	assert.Equal(t, Resources{Metal: 800, Crystal: 400, Deuterium: 200}, ShipyardCost(2))
+	assert.Equal(t, Resources{Metal: 6553600, Crystal: 3276800, Deuterium: 1638400}, ShipyardCost(15))
+
+	// metalstorage
+	assert.Equal(t, Resources{Metal: 1000}, MetalStorageCost(1))
+	assert.Equal(t, Resources{Metal: 2000}, MetalStorageCost(2))
+	assert.Equal(t, Resources{Metal: 16384000}, MetalStorageCost(15))
+
+	// crystalstorage
+	assert.Equal(t, Resources{Metal: 1000, Crystal: 500}, CrystalStorageCost(1))
+	assert.Equal(t, Resources{Metal: 2000, Crystal: 1000}, CrystalStorageCost(2))
+	assert.Equal(t, Resources{Metal: 16384000, Crystal: 8192000}, CrystalStorageCost(15))
+
+	// deuteriumstorage
+	assert.Equal(t, Resources{Metal: 1000, Crystal: 1000}, DeuteriumStorageCost(1))
+	assert.Equal(t, Resources{Metal: 2000, Crystal: 2000}, DeuteriumStorageCost(2))
+	assert.Equal(t, Resources{Metal: 16384000, Crystal: 16384000}, DeuteriumStorageCost(15))
+
 	// researchlab
 	assert.Equal(t, Resources{Metal: 200, Crystal: 400, Deuterium: 200}, RessearchLabCost(1))
 	assert.Equal(t, Resources{Metal: 400, Crystal: 800, Deuterium: 400}, RessearchLabCost(2))
 	assert.Equal(t, Resources{Metal: 3276800, Crystal: 6553600, Deuterium: 3276800}, RessearchLabCost(15))
+
+	// alliancedepot
+	assert.Equal(t, Resources{Metal: 20000, Crystal: 40000}, AllianceDepotCost(1))
+	assert.Equal(t, Resources{Metal: 40000, Crystal: 80000}, AllianceDepotCost(2))
+	assert.Equal(t, Resources{Metal: 327680000, Crystal: 655360000}, AllianceDepotCost(15))
+
+	// missilesilo
+	assert.Equal(t, Resources{Metal: 20000, Crystal: 20000, Deuterium: 1000}, MissileSiloCost(1))
+	assert.Equal(t, Resources{Metal: 40000, Crystal: 40000, Deuterium: 2000}, MissileSiloCost(2))
+	assert.Equal(t, Resources{Metal: 327680000, Crystal: 327680000, Deuterium: 16384000}, MissileSiloCost(15))
+
+	// spacedock
+	assert.Equal(t, Resources{Metal: 20000, Crystal: 20000, Deuterium: 1000}, SpaceDockCost(1))
+	assert.Equal(t, Resources{Metal: 40000, Crystal: 40000, Deuterium: 2000}, SpaceDockCost(2))
+	assert.Equal(t, Resources{Metal: 327680000, Crystal: 327680000, Deuterium: 16384000}, SpaceDockCost(15))
 }
