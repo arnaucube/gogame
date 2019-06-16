@@ -1,7 +1,10 @@
 package gamesrv
 
 import (
+	"errors"
 	"fmt"
+	"strconv"
+	"time"
 
 	"github.com/arnaucube/gogame/constants"
 	"github.com/arnaucube/gogame/database"
@@ -42,7 +45,7 @@ func (srv Service) CreatePlanet(userId bson.ObjectId) (*models.SolarSystem, *mod
 		return nil, nil, err
 	}
 	var planet *models.Planet
-	err = srv.db.Planets.Find(bson.M{"name": name}).One(&planet)
+	err = srv.db.Planets.Find(bson.M{"ownerid": newPlanet.OwnerId}).One(&planet)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -92,13 +95,40 @@ func (srv Service) PutPlanetInSolarSystem(position int64, planet *models.Planet)
 	return &solarSystem, err
 }
 
+// CheckCurrentBuild checks if the planet has a ongoing building in process, and if has finished
+// in case that has finished, updates it in db
+func (srv Service) CheckCurrentBuild(planet *models.Planet) (bool, error) {
+	if planet.CurrentBuild.Title != "" {
+		// the planet is building something, check if has ended
+		if planet.CurrentBuild.Ends.Unix() < time.Now().Unix() {
+			// upgrade level of building in planet
+			planet.Buildings[planet.CurrentBuild.Building] += 1
+
+			// build end
+			planet.CurrentBuild.Title = ""
+			planet.CurrentBuild.Building = ""
+
+			// store in db
+			err := srv.db.Planets.Update(bson.M{"_id": planet.Id}, planet)
+			if err != nil {
+				return true, err
+			}
+			return false, nil
+		}
+		return true, nil
+	}
+	return false, nil
+
+}
+
 func (srv Service) GetBuildings(user *models.User, planetid bson.ObjectId) (*models.Planet, error) {
 	var planet models.Planet
 	err := srv.db.Planets.Find(bson.M{"_id": planetid, "ownerid": user.Id}).One(&planet)
 	if err != nil {
 		return nil, err
 	}
-	return &planet, nil
+	_, err = srv.CheckCurrentBuild(&planet)
+	return &planet, err
 }
 
 func (srv Service) UpgradeBuilding(user *models.User, planetid bson.ObjectId, building string) (*models.Planet, error) {
@@ -108,22 +138,33 @@ func (srv Service) UpgradeBuilding(user *models.User, planetid bson.ObjectId, bu
 	if err != nil {
 		return nil, err
 	}
+	busy, err := srv.CheckCurrentBuild(&planet)
+	if err != nil {
+		return nil, err
+	}
+	if busy {
+		return nil, errors.New("busy")
+	}
 
 	// get current building level, and get the needed resources for next level
 	resourcesNeeded, err := user.GetBuildingCost(planet, building)
 	if err != nil {
 		return nil, err
 	}
+	// get time cost of the build
+	timei64 := models.ConstructionTime(resourcesNeeded, planet.Buildings[building]+1)
+	endsTime := time.Now().Add(time.Second * time.Duration(timei64))
 
-	fmt.Println("bui", building)
-	fmt.Println("needed", resourcesNeeded)
 	// if user have enough resources to upgrade the building, upgrade the building
 	err = user.SpendResources(resourcesNeeded)
 	if err != nil {
 		return nil, err
 	}
-	// upgrade level of building in planet
-	planet.Buildings[building] += 1
+	// add current task to planet
+	planet.CurrentBuild.Building = building
+	planet.CurrentBuild.Title = building + " - Level " + strconv.Itoa(int(planet.Buildings[building]))
+	planet.CurrentBuild.Ends = endsTime
+
 	// store planet in db
 	err = srv.db.Planets.Update(bson.M{"_id": planet.Id}, planet)
 	return &planet, nil
