@@ -105,3 +105,25 @@ func TestMineCost(t *testing.T) {
 	assert.Equal(t, Resources{Metal: 40000, Crystal: 40000, Deuterium: 2000}, SpaceDockCost(2))
 	assert.Equal(t, Resources{Metal: 327680000, Crystal: 327680000, Deuterium: 16384000}, SpaceDockCost(15))
 }
+
+func TestConstructionTime(t *testing.T) {
+	// Numbers of the online calculators
+	// assert.Equal(t, int64(30), ConstructionTime(Resources{Metal: 60, Crystal: 15}, 1))
+	// assert.Equal(t, int64(53), ConstructionTime(Resources{Metal: 90, Crystal: 22}, 1))
+	// assert.Equal(t, int64(96), ConstructionTime(Resources{Metal: 135, Crystal: 33}, 1))
+	// assert.Equal(t, int64(383340), ConstructionTime(Resources{Metal: 204800, Crystal: 61440}, 10))
+
+	// Numbers following the formulas
+	assert.Equal(t, int64(27), ConstructionTime(Resources{Metal: 60, Crystal: 15}, 1))
+	assert.Equal(t, int64(40), ConstructionTime(Resources{Metal: 90, Crystal: 22}, 1))
+	assert.Equal(t, int64(60), ConstructionTime(Resources{Metal: 135, Crystal: 33}, 1))
+	assert.Equal(t, int64(17426), ConstructionTime(Resources{Metal: 204800, Crystal: 61440}, 10))
+}
+func TestRessearchTime(t *testing.T) {
+	assert.Equal(t, int64(1440), RessearchTime(Resources{Metal: 0, Crystal: 800}, 1))
+	assert.Equal(t, int64(5236), RessearchTime(Resources{Metal: 12800, Crystal: 3200}, 10))
+
+	// Numbers of the online calculators
+	// assert.Equal(t, int64(2880), RessearchTime(Resources{Metal: 12800, Crystal: 6400}, 15))
+	// assert.Equal(t, int64(360), RessearchTime(Resources{Metal: 1600, Crystal: 800}, 15))
+}

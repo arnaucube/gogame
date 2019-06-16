@@ -5,3 +5,28 @@ Nostalgic OGame clone in Go
 WIP
 
 The frontend is in https://github.com/arnaucube/gogame-frontend
+
+
+
+- [x] queue system
+- [x] server api
+- [ ] log system (console print and file save)
+- [x] register/login
+- [ ] data models
+	- [x] user
+	- [x] planet
+	- [x] galaxy
+	- [ ] ships
+- [x] mongodb connectors
+- [x] buildings engine
+- [x] resources engine
+- [ ] costs calculators
+	- [x] mining growth from mines/buildings
+	- [x] building costs
+	- [x] building time
+	- [x] research time
+	- [ ] energy costs
+	- [ ] ships costs
+	- [ ] ships building time
+	- [ ] ships travel time
+- [ ] battle engine

@@ -293,3 +293,17 @@ func SpaceDockCost(ilvl int64) Resources {
 	cost.Energy = int64(float64(base.Energy) * math.Pow(2, lvl-1))
 	return cost
 }
+
+// TODO ConstructionTime and ResearchTime are following the formulas from https://ogame.fandom.com/wiki/Formulas
+// but are not giving exact same numbers than in online calculators
+func ConstructionTime(r Resources, roboticsLvl int64) int64 {
+	naniteLvl := float64(1)
+	// T(h) = (metal + crystal) / (2500 * (1+roboticsLvl) * 2^naniteLvl * universespeed)
+	tHours := float64(r.Metal+r.Crystal) / (float64(2500) * float64(1+roboticsLvl) * math.Pow(2, naniteLvl) * constants.UniverseAcceleration)
+	return int64(tHours * 3600)
+}
+func RessearchTime(r Resources, researchLvl int64) int64 {
+	// T(h) = (metal + crystal) / (1000 * (1+researchLvl * universespeed)
+	tHours := float64(r.Metal+r.Crystal) / (float64(1000) * float64(1+researchLvl*constants.UniverseAcceleration))
+	return int64(tHours * 3600)
+}
