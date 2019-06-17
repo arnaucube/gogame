@@ -11,9 +11,10 @@ import (
 
 type Process struct {
 	// if Title == "", is not active, and can build other buildings/research
-	Title    string // building name / research name + level
-	Building string
-	Ends     time.Time
+	Title     string // building name / research name + level
+	Building  string
+	Ends      time.Time
+	CountDown int64
 }
 
 type Resources struct {
@@ -221,6 +222,8 @@ func (p *Planet) CheckCurrentBuild() (bool, error) {
 			}
 			return false, nil
 		}
+		p.CurrentBuild.CountDown = p.CurrentBuild.Ends.Unix() - time.Now().Unix()
+
 		return true, nil
 	}
 	return false, nil
@@ -253,6 +256,7 @@ func (p *Planet) UpgradeBuilding(building string) error {
 	p.CurrentBuild.Building = building
 	p.CurrentBuild.Title = building + " - Level " + strconv.Itoa(int(p.Buildings[building]))
 	p.CurrentBuild.Ends = endsTime
+	p.CurrentBuild.CountDown = p.CurrentBuild.Ends.Unix() - time.Now().Unix()
 
 	// store planet in db
 	err = p.Db.Planets.Update(bson.M{"_id": p.Id}, p)
