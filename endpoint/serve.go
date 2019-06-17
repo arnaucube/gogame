@@ -24,7 +24,7 @@ var gameservice *gamesrv.Service
 func newApiService() *gin.Engine {
 	api := gin.Default()
 	api.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://127.0.0.1:8080"},
+		AllowOrigins:     []string{serverConfig.Server.CorsOriginsAllowed},
 		AllowMethods:     []string{"GET", "POST"},
 		AllowHeaders:     []string{"Authorization", "Content-Type"},
 		AllowCredentials: true,

@@ -50,6 +50,9 @@ func (srv Service) Register(name, password, email string) (*models.User, error) 
 	}
 
 	_, planet, err := srv.gamesrv.CreatePlanet(user.Id)
+	if err != nil {
+		return nil, err
+	}
 
 	user.Planets = append(user.Planets, planet.Id)
 	user.StoreInDb()
@@ -92,8 +95,7 @@ func (srv Service) GetUserById(userid bson.ObjectId) (*models.User, error) {
 		return nil, err
 	}
 	user := models.UserDbToUser(srv.db, userDb)
-	_, err = user.GetResources()
-	return user, err
+	return user, nil
 }
 
 func (srv Service) GetUserPlanetsById(userid bson.ObjectId) ([]*models.Planet, error) {

@@ -9,8 +9,9 @@ import (
 
 type Config struct {
 	Server struct {
-		ServiceApi string
-		AdminApi   string
+		ServiceApi         string
+		AdminApi           string
+		CorsOriginsAllowed string
 	}
 	Mongodb struct {
 		Url      string

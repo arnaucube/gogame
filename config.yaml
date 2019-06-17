@@ -1,6 +1,7 @@
 server:
         serviceapi: 0.0.0.0:5000
         adminapi: 127.0.0.1:5001
+        corsoriginsallowed: http://127.0.0.1:8080
 mongodb:
         url: 127.0.0.1:27017
         database: "gogame"

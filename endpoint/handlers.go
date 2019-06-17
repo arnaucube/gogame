@@ -73,15 +73,9 @@ func handleGetUser(c *gin.Context) {
 		fail(c, err, "error on getting user")
 		return
 	}
-	// resources, err := user.GetResources()
-	// if err != nil {
-	//         fail(c, err, "error on getting user resources")
-	//         return
-	// }
 
 	c.JSON(200, gin.H{
 		"user": user,
-		// "resources": resources,
 	})
 }
 
@@ -94,15 +88,9 @@ func handleGetResources(c *gin.Context) {
 		fail(c, err, "error on getting user")
 		return
 	}
-	resources, err := user.GetResources()
-	if err != nil {
-		fail(c, err, "error on getting user resources")
-		return
-	}
 
 	c.JSON(200, gin.H{
-		"user":      user,
-		"resources": resources,
+		"user": user,
 	})
 }
 
@@ -132,7 +120,7 @@ func handleGetPlanet(c *gin.Context) {
 		return
 	}
 
-	planet, err := gameservice.GetBuildings(user, bson.ObjectIdHex(planetid))
+	planet, err := gameservice.GetPlanet(user, bson.ObjectIdHex(planetid))
 	if err != nil {
 		fail(c, err, "error upgrading building")
 		return
