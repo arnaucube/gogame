@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 	"time"
 
@@ -50,10 +51,11 @@ type Planet struct {
 
 func NewPlanet(db *database.Db, size int64, name string, ownerId bson.ObjectId) (*Planet, error) {
 	newPlanet := Planet{
-		Db:      db,
-		Size:    size,
-		Name:    name,
-		OwnerId: ownerId,
+		Db:          db,
+		LastUpdated: time.Now(),
+		Size:        size,
+		Name:        name,
+		OwnerId:     ownerId,
 		Resources: Resources{
 			Metal:     500,
 			Crystal:   500,
@@ -73,12 +75,14 @@ func NewPlanet(db *database.Db, size int64, name string, ownerId bson.ObjectId) 
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println(newPlanet.Resources)
 
 	var planet *Planet
 	err = db.Planets.Find(bson.M{"ownerid": newPlanet.OwnerId}).One(&planet)
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println(planet.Resources)
 
 	return planet, nil
 }
@@ -132,7 +136,6 @@ func (p *Planet) GetResources() (*Resources, error) {
 		return nil, err
 	}
 
-	// return user
 	return &p.Resources, nil
 }
 
@@ -208,6 +211,21 @@ func (p *Planet) CheckCurrentBuild() (bool, error) {
 	if p.CurrentBuild.Title != "" {
 		// the planet is building something, check if has ended
 		if p.CurrentBuild.Ends.Unix() < time.Now().Unix() {
+			// add points for resources spend
+			resourcesNeeded, err := p.GetBuildingCost(p.CurrentBuild.Building)
+			if err != nil {
+				return true, err
+			}
+
+			// add points for resources used (each 1000 units, 1 point
+			points := ResourcesToPoints(resourcesNeeded)
+			// 1000 point is the 1 point for the building
+			points += 1000
+			err = AddPoints(p.Db, p.OwnerId, points)
+			if err != nil {
+				return true, err
+			}
+
 			// upgrade level of building in planet
 			p.Buildings[p.CurrentBuild.Building] += 1
 
@@ -216,7 +234,7 @@ func (p *Planet) CheckCurrentBuild() (bool, error) {
 			p.CurrentBuild.Building = ""
 
 			// store in db
-			err := p.Db.Planets.Update(bson.M{"_id": p.Id}, p)
+			err = p.Db.Planets.Update(bson.M{"_id": p.Id}, p)
 			if err != nil {
 				return true, err
 			}
@@ -229,6 +247,7 @@ func (p *Planet) CheckCurrentBuild() (bool, error) {
 	return false, nil
 
 }
+
 func (p *Planet) UpgradeBuilding(building string) error {
 	busy, err := p.CheckCurrentBuild()
 	if err != nil {
@@ -244,7 +263,7 @@ func (p *Planet) UpgradeBuilding(building string) error {
 		return err
 	}
 	// get time cost of the build
-	timei64 := ConstructionTime(resourcesNeeded, p.Buildings[building]+1)
+	timei64 := ConstructionTime(resourcesNeeded, p.Buildings["roboticsfactory"])
 	endsTime := time.Now().Add(time.Second * time.Duration(timei64))
 
 	// if user have enough resources to upgrade the building, upgrade the building
@@ -252,6 +271,7 @@ func (p *Planet) UpgradeBuilding(building string) error {
 	if err != nil {
 		return err
 	}
+
 	// add current task to planet
 	p.CurrentBuild.Building = building
 	p.CurrentBuild.Title = building + " - Level " + strconv.Itoa(int(p.Buildings[building]))
@@ -261,4 +281,14 @@ func (p *Planet) UpgradeBuilding(building string) error {
 	// store planet in db
 	err = p.Db.Planets.Update(bson.M{"_id": p.Id}, p)
 	return nil
+}
+
+func ResourcesToPoints(r Resources) int64 {
+	p := int64(0)
+	p = p + r.Metal
+	p = p + r.Crystal
+	p = p + r.Deuterium
+	p = p + r.Energy
+	fmt.Println("p", p)
+	return p
 }

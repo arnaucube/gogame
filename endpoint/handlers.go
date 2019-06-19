@@ -34,7 +34,11 @@ type RegisterMsg struct {
 
 func handleRegister(c *gin.Context) {
 	var registerMsg RegisterMsg
-	c.BindJSON(&registerMsg)
+	err := c.BindJSON(&registerMsg)
+	if err != nil {
+		fail(c, err, "error on json")
+		return
+	}
 	user, err := userservice.Register(registerMsg.Name, registerMsg.Password, registerMsg.Email)
 	if err != nil {
 		fail(c, err, "error on register")
@@ -52,7 +56,11 @@ type LoginMsg struct {
 
 func handleLogin(c *gin.Context) {
 	var loginMsg LoginMsg
-	c.BindJSON(&loginMsg)
+	err := c.BindJSON(&loginMsg)
+	if err != nil {
+		fail(c, err, "error on json")
+		return
+	}
 	token, user, err := userservice.Login(loginMsg.Email, loginMsg.Password)
 	if err != nil {
 		fail(c, err, "error on login")

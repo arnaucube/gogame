@@ -20,6 +20,7 @@ The frontend is in https://github.com/arnaucube/gogame-frontend
 - [x] mongodb connectors
 - [x] buildings engine
 - [x] resources engine
+- [x] points
 - [ ] costs calculators
 	- [x] mining growth from mines/buildings
 	- [x] building costs

@@ -15,6 +15,7 @@ type UserDb struct {
 	Email       string
 	LastUpdated time.Time
 	Planets     []bson.ObjectId
+	Points      int64 // real points are this value / 1000
 }
 
 // User is the data in memory, after getting it from DB
@@ -24,6 +25,7 @@ type User struct {
 	Name        string
 	LastUpdated time.Time
 	Planets     []bson.ObjectId
+	Points      int64
 }
 
 func NewUser(db *database.Db, name, password, email string) (*User, error) {
@@ -33,6 +35,7 @@ func NewUser(db *database.Db, name, password, email string) (*User, error) {
 		Password:    password,
 		Email:       email,
 		LastUpdated: time.Now(),
+		Points:      0,
 	}
 	err := db.Users.Insert(newUser)
 	if err != nil {
@@ -49,6 +52,7 @@ func UserDbToUser(db *database.Db, u UserDb) *User {
 		LastUpdated: u.LastUpdated,
 		db:          db,
 		Planets:     u.Planets,
+		Points:      u.Points,
 	}
 }
 
@@ -78,4 +82,18 @@ func (u *User) GetPlanets() ([]Planet, error) {
 		return planets, err
 	}
 	return planets, nil
+}
+
+func AddPoints(db *database.Db, userId bson.ObjectId, points int64) error {
+	var userDb UserDb
+	err := db.Users.Find(bson.M{"_id": userId}).One(&userDb)
+	if err != nil {
+		return err
+	}
+	newPoints := userDb.Points + points
+
+	err = db.Users.Update(bson.M{"_id": userId}, bson.M{"$set": bson.M{
+		"points": newPoints,
+	}})
+	return err
 }
