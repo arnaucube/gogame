@@ -59,6 +59,25 @@ func FusionGrowth(ilvl int64, ilvlTech int64, idelta int64) int64 {
 	return int64(r)
 }
 
+func MetalMineEnergyConsumption(ilvl int64) int64 {
+	lvl := float64(ilvl)
+	// 10 * lvl * 1.1^lvl
+	c := 10 * lvl * math.Pow(1.1, lvl)
+	return int64(c)
+}
+func CrystalMineEnergyConsumption(ilvl int64) int64 {
+	lvl := float64(ilvl)
+	// 10 * lvl * 1.1^lvl
+	c := 10 * lvl * math.Pow(1.1, lvl)
+	return int64(c)
+}
+func DeuteriumMineEnergyConsumption(ilvl int64) int64 {
+	lvl := float64(ilvl)
+	// 20 * lvl * 1.1^lvl
+	c := 10 * lvl * math.Pow(1.1, lvl)
+	return int64(c)
+}
+
 // https://ogame.fandom.com/wiki/Buildings
 
 // https://ogame.fandom.com/wiki/Metal_Mine

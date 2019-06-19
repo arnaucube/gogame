@@ -69,20 +69,18 @@ func NewPlanet(db *database.Db, size int64, name string, ownerId bson.ObjectId) 
 	newPlanet.Buildings["metalmine"] = 1
 	newPlanet.Buildings["crystalmine"] = 1
 	newPlanet.Buildings["deuteriummine"] = 1
-	newPlanet.Buildings["energymine"] = 1
+	// newPlanet.Buildings["energymine"] = 1
 
 	err := db.Planets.Insert(newPlanet)
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(newPlanet.Resources)
 
 	var planet *Planet
 	err = db.Planets.Find(bson.M{"ownerid": newPlanet.OwnerId}).One(&planet)
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(planet.Resources)
 
 	return planet, nil
 }
@@ -229,6 +227,17 @@ func (p *Planet) CheckCurrentBuild() (bool, error) {
 			// upgrade level of building in planet
 			p.Buildings[p.CurrentBuild.Building] += 1
 
+			// substrate the energy used by the building
+			var usedEnergy int64
+			if p.CurrentBuild.Building == "metalmine" {
+				usedEnergy = MetalMineEnergyConsumption(p.Buildings["metalmine"])
+			} else if p.CurrentBuild.Building == "crystalmine" {
+				usedEnergy = CrystalMineEnergyConsumption(p.Buildings["crystalmine"])
+			} else if p.CurrentBuild.Building == "deuteriummine" {
+				usedEnergy = DeuteriumMineEnergyConsumption(p.Buildings["deuteriummine"])
+			}
+			p.Resources.Energy = p.Resources.Energy - usedEnergy
+
 			// build end
 			p.CurrentBuild.Title = ""
 			p.CurrentBuild.Building = ""
@@ -274,7 +283,7 @@ func (p *Planet) UpgradeBuilding(building string) error {
 
 	// add current task to planet
 	p.CurrentBuild.Building = building
-	p.CurrentBuild.Title = building + " - Level " + strconv.Itoa(int(p.Buildings[building]))
+	p.CurrentBuild.Title = building + " - Level " + strconv.Itoa(int(p.Buildings[building])+1)
 	p.CurrentBuild.Ends = endsTime
 	p.CurrentBuild.CountDown = p.CurrentBuild.Ends.Unix() - time.Now().Unix()
 
