@@ -5,7 +5,7 @@ package constants
 const GALAXYSIZE = 50
 const SOLARSYSTEMSIZE = 15
 
-const UniverseAcceleration = 5
+const UniverseAcceleration = 1
 const MineVelocity = 1
 
 // extra

@@ -39,14 +39,11 @@ func DeuteriumGrowth(ilvl int64, idelta int64) int64 {
 	r := (perHour / 60) * delta * constants.MineVelocity
 	return int64(r)
 }
-func SolarGrowth(ilvl int64, idelta int64) int64 {
+func SolarGrowth(ilvl int64) int64 {
 	lvl := float64(ilvl)
-	delta := float64(idelta)
-
 	// 20 * L * 1.1^L
-	perHour := constants.UniverseAcceleration * 20 * lvl * math.Pow(1.1, lvl)
-	r := (perHour / 60) * delta * constants.MineVelocity
-	return int64(r)
+	production := 20 * lvl * math.Pow(1.1, lvl)
+	return int64(production)
 }
 func FusionGrowth(ilvl int64, ilvlTech int64, idelta int64) int64 {
 	lvl := float64(ilvl)

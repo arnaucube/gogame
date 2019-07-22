@@ -24,9 +24,9 @@ func TestGrowth(t *testing.T) {
 	assert.Equal(t, int64(19), DeuteriumGrowth(2, 60)/constants.MineVelocity)
 
 	// solar
-	assert.Equal(t, int64(22), SolarGrowth(1, 60)/constants.MineVelocity)
-	assert.Equal(t, int64(44), SolarGrowth(1, 120)/constants.MineVelocity)
-	assert.Equal(t, int64(48), SolarGrowth(2, 60)/constants.MineVelocity)
+	assert.Equal(t, int64(22), SolarGrowth(1))
+	assert.Equal(t, int64(48), SolarGrowth(2))
+	assert.Equal(t, int64(79), SolarGrowth(3))
 
 	// fusion
 	assert.Equal(t, int64(31), FusionGrowth(1, 1, 60)/constants.MineVelocity)

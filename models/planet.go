@@ -2,7 +2,6 @@ package models
 
 import (
 	"errors"
-	"fmt"
 	"strconv"
 	"time"
 
@@ -116,17 +115,24 @@ func (p *Planet) GetResources() (*Resources, error) {
 
 	// get Resource-Plant level in each planet
 	// and calculate growth = ResourcePlant.Level for each planet
-	var metalGrowth, crystalGrowth, deuteriumGrowth, energyGrowth int64
+	var metalGrowth, crystalGrowth, deuteriumGrowth int64
 	metalGrowth = metalGrowth + MetalGrowth(p.Buildings["metalmine"], int64(delta))
-	crystalGrowth = crystalGrowth + MetalGrowth(p.Buildings["crystalmine"], int64(delta))
-	deuteriumGrowth = deuteriumGrowth + MetalGrowth(p.Buildings["deuteriummine"], int64(delta))
-	energyGrowth = energyGrowth + MetalGrowth(p.Buildings["energymine"], int64(delta))
+	crystalGrowth = crystalGrowth + CrystalGrowth(p.Buildings["crystalmine"], int64(delta))
+	deuteriumGrowth = deuteriumGrowth + DeuteriumGrowth(p.Buildings["deuteriummine"], int64(delta))
+
+	// get energy generated and used
+	energyGenerated := int64(500)
+	energyGenerated = energyGenerated + SolarGrowth(p.Buildings["energymine"])
+	var energyUsed int64
+	energyUsed = energyUsed + MetalMineEnergyConsumption(p.Buildings["metalmine"])
+	energyUsed = energyUsed + CrystalMineEnergyConsumption(p.Buildings["crystalmine"])
+	energyUsed = energyUsed + DeuteriumMineEnergyConsumption(p.Buildings["deuteriummine"])
 
 	// calculate newAmount = oldAmount + growth
 	p.Resources.Metal = p.Resources.Metal + metalGrowth
 	p.Resources.Crystal = p.Resources.Crystal + crystalGrowth
 	p.Resources.Deuterium = p.Resources.Deuterium + deuteriumGrowth
-	p.Resources.Energy = p.Resources.Energy + energyGrowth
+	p.Resources.Energy = energyGenerated - energyUsed
 
 	// store new amount to user db
 	err = p.StoreInDb()
@@ -152,9 +158,9 @@ func (p *Planet) SpendResources(r Resources) error {
 	if p.Resources.Deuterium < r.Deuterium {
 		return errors.New("not enough deuterium resources")
 	}
-	if p.Resources.Energy < r.Energy {
-		return errors.New("not enough energy resources")
-	}
+	// if p.Resources.Energy < r.Energy {
+	//         return errors.New("not enough energy resources")
+	// }
 
 	p.Resources.Metal = p.Resources.Metal - r.Metal
 	p.Resources.Crystal = p.Resources.Crystal - r.Crystal
@@ -271,6 +277,7 @@ func (p *Planet) UpgradeBuilding(building string) error {
 	if err != nil {
 		return err
 	}
+	resourcesNeeded.Energy = 0
 	// get time cost of the build
 	timei64 := ConstructionTime(resourcesNeeded, p.Buildings["roboticsfactory"])
 	endsTime := time.Now().Add(time.Second * time.Duration(timei64))
@@ -298,6 +305,5 @@ func ResourcesToPoints(r Resources) int64 {
 	p = p + r.Crystal
 	p = p + r.Deuterium
 	p = p + r.Energy
-	fmt.Println("p", p)
 	return p
 }

@@ -26,8 +26,13 @@ The frontend is in https://github.com/arnaucube/gogame-frontend
 	- [x] building costs
 	- [x] building time
 	- [x] research time
-	- [ ] energy costs
+	- [x] energy costs
+	- [x] energy production
+	- [ ] production factor (based on positive/negative energy)
+- [ ] ships
 	- [ ] ships costs
 	- [ ] ships building time
 	- [ ] ships travel time
 - [ ] battle engine
+- [ ] lab technologies
+	- [ ] how tech affects to production of material & times
